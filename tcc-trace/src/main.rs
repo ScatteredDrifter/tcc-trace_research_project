@@ -9,7 +9,7 @@ use aya::maps::perf::AsyncPerfEventArray;
 use aya::maps::HashMap;
 use aya::programs::{tc, SchedClassifier, TcAttachType, TracePoint};
 use aya::util::online_cpus;
-use aya::{include_bytes_aligned, Bpf};
+use aya::{include_bytes_aligned, Bpf };
 use aya_log::BpfLogger;
 use bytes::BytesMut;
 use clap::Parser;
@@ -116,7 +116,7 @@ async fn main() -> Result<(), anyhow::Error> {
     let mut bpf = Bpf::load(include_bytes_aligned!(
         "../../target/bpfel-unknown-none/release/tcc-trace"
     ))?;
-    BpfLogger::init(&mut bpf)?;
+    aya_log::BpfLogger::init(&mut bpf)?;
 
     let start = Instant::now();
     let program: &mut TracePoint = bpf.program_mut("tcc_trace").unwrap().try_into()?;
@@ -147,8 +147,8 @@ async fn main() -> Result<(), anyhow::Error> {
             None => "lo".to_string(),
         };
         let _ = tc::qdisc_add_clsact(&ifname);
-        tcprog.attach(&ifname, TcAttachType::Ingress, 0)?;
-        tcprog.attach(&ifname, TcAttachType::Egress, 0)?;
+        tcprog.attach(&ifname, TcAttachType::Ingress)?;
+        tcprog.attach(&ifname, TcAttachType::Egress)?;
     }
 
     if let Some(ip) = ip {
@@ -401,7 +401,7 @@ fn start_tcpinfo_server(congestion_control: Option<String>) -> Result<(), anyhow
 
     let congestion = TcpCongestion {};
     congestion.set(
-        socket.as_raw_fd(),
+        &socket,
         &OsString::from(congestion_control.unwrap_or("cubic".to_string())),
     )?;
 

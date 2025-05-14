@@ -5,7 +5,8 @@ edition = "2021"
 publish = false
 
 [dependencies]
-aya = { version = ">=0.11", features=["async_tokio"], git = "https://github.com/aya-rs/aya" }
+# aya = { version = "0.11.0", features=["async_tokio"], git = "https://github.com/aya-rs/aya" }
+aya = "0.10.0"
 aya-log = {  git = "https://github.com/aya-rs/aya" }
 bytes = "1"
 tcc-trace-common = { path = "../tcc-trace-common", features=["user"] }
@@ -18,7 +19,7 @@ socket2 = "*"
 libc = "*"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-nix = "*"
+nix = { version = "*", features = ["socket","net"] }
 
 [[bin]]
 name = "tcc-trace"

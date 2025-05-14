@@ -8,6 +8,7 @@ edition = "2021"
 aya-log-ebpf = {  git = "https://github.com/aya-rs/aya" }
 tcc-trace-common = { path = "../tcc-trace-common" }
 memoffset = "0.6"
+aya-obj = "0.2.1"
 
 [[bin]]
 name = "tcc-trace"
