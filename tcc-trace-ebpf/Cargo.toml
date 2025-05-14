@@ -4,7 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-aya-bpf = { git = "https://github.com/aya-rs/aya" }
+# aya-bpf = { git = "https://github.com/aya-rs/aya" }
+aya = "0.13.1"
 aya-log-ebpf = {  git = "https://github.com/aya-rs/aya" }
 tcc-trace-common = { path = "../tcc-trace-common" }
 memoffset = "0.6"
