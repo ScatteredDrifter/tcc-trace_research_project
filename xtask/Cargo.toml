@@ -5,9 +5,12 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1"
-clap = { version = "3.1", features = ["derive"] }
-aya-gen = { git = "https://github.com/aya-rs/aya", branch = "main" }
+# clap = { version = "3.1", features = ["derive"] }
+ clap = { version = "*", features = ["derive"] }
+aya-tool = { git = "https://github.com/aya-rs/aya", branch = "main" }
 bindgen = "*"
+aya = "*"
+aya-log = "0.2.1"
 
 [build-dependencies]
-bindgen = "0.60.1"
+bindgen = "0.71.1"

@@ -4,6 +4,7 @@ use std::os::unix::prelude::AsRawFd;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{mpsc, Arc};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+use anyhow::Context;
 
 use aya::maps::perf::AsyncPerfEventArray;
 use aya::maps::HashMap;
@@ -130,9 +131,12 @@ async fn main() -> Result<(), anyhow::Error> {
     let mut handler = Handler::new(ip, port);
     let event_count = Arc::new(AtomicU64::new(0));
     let filtered_count = Arc::new(AtomicU64::new(0));
-    let mut perf_array = AsyncPerfEventArray::try_from(bpf.map_mut("TCP_PROBES")?)?;
-    let mut tcc_settings = HashMap::try_from(bpf.map_mut("TCC_SETTINGS")?)?;
-    let mut matchlist_v4 = HashMap::try_from(bpf.map_mut("MATCHLIST_V4")?)?;
+    let map_tcprobes = bpf.map_mut("TCP_PROBES").unwrap();
+    let map_tcpsettings = bpf.map_mut("TCC_SETTINGS").unwrap();
+    let map_matchlist_v4 = bpf.map_mut("MATCHLIST_V4").unwrap();
+    let mut perf_array = AsyncPerfEventArray::try_from(map_tcprobes).unwrap();
+    let mut tcc_settings = HashMap::try_from(map_tcpsettings).unwrap();
+    let mut matchlist_v4 = HashMap::try_from(map_matchlist_v4).unwrap();
 
     if let (Some(map_from), Some(map_to)) = (map_from, map_to) {
         println!("Set up port forwarding...");
@@ -147,8 +151,8 @@ async fn main() -> Result<(), anyhow::Error> {
             None => "lo".to_string(),
         };
         let _ = tc::qdisc_add_clsact(&ifname);
-        tcprog.attach(&ifname, TcAttachType::Ingress, 0)?;
-        tcprog.attach(&ifname, TcAttachType::Egress, 0)?;
+        tcprog.attach(&ifname, TcAttachType::Ingress)?;
+        tcprog.attach(&ifname, TcAttachType::Egress)?;
     }
 
     if let Some(ip) = ip {
@@ -171,7 +175,7 @@ async fn main() -> Result<(), anyhow::Error> {
         }
     });
 
-    for cpu_id in online_cpus()? {
+    for cpu_id in online_cpus().unwrap() {
         let event_count = event_count.clone();
         let filtered_count = filtered_count.clone();
 
