@@ -109,7 +109,7 @@ async fn main() -> Result<(), anyhow::Error> {
     // like to specify the eBPF program at runtime rather than at compile-time, you can
     // reach for `Bpf::load_file` instead.
     #[cfg(debug_assertions)]
-    let mut bpf = Bpf::load(include_bytes_aligned!(
+    let mut bpf = Bpf::load_file(include_bytes_aligned!(
         "../../target/bpfel-unknown-none/debug/tcc-trace"
     ))?;
     #[cfg(not(debug_assertions))]
